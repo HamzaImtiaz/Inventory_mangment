@@ -34,9 +34,94 @@ public class Main_page extends javax.swing.JFrame {
         populate_sales(); //Code to Populate Sales Tab
         populate_purchase();//Code to Populate Purchase
         populate_inventory();//Code to Populate Purchase
+        populate_profit();//Code to Populate Profit & profit_percent
+      
           
             
         
+    }
+    public void  populate_profit() throws SQLException
+    {
+         ResultSet rs1=null;
+         ResultSet rs2=null;
+           PreparedStatement pst = null;
+           PreparedStatement pst1 = null;
+        
+            if(filtered==1)
+            {
+            pst = login.conn.prepareStatement("SELECT SUM(value) as sale FROM cost_of_sales where Date=?");
+            pst1 = login.conn.prepareStatement("SELECT SUM(Amount) as sale FROM sales where Date=?");
+             pst.setDate(1,  new java.sql.Date(jDateChooser1.getDate().getTime()));
+              pst1.setDate(1,  new java.sql.Date(jDateChooser1.getDate().getTime()));
+              
+            }
+            else if(filtered==2)
+            {
+                 pst = login.conn.prepareStatement("SELECT SUM(value) as sale FROM cost_of_sales where Month=?");
+            pst1 = login.conn.prepareStatement("SELECT SUM(Amount) as sale FROM sales where Month=?");
+             pst.setDate(1,  new java.sql.Date(jMonthChooser1.getMonth()));
+              pst1.setDate(1,  new java.sql.Date(jMonthChooser1.getMonth()));
+                
+                
+             
+            }
+            else if(filtered==3)
+            {
+                 pst = login.conn.prepareStatement("SELECT SUM(value) as sale FROM cost_of_sales where Year=?");
+            pst1 = login.conn.prepareStatement("SELECT SUM(Amount) as sale FROM sales where Year=?");
+             pst.setDate(1,  new java.sql.Date(jYearChooser1.getYear()));
+              pst1.setDate(1,  new java.sql.Date(jYearChooser1.getYear()));
+                
+               
+            }
+            
+            
+       
+      float sale_amount=0,cost_of_sale_amount=0;
+      if(pst!=null)
+           {
+      try {
+           
+           
+             rs1 = pst.executeQuery();
+             } catch (SQLException ex) {
+            Logger.getLogger(Main_page.class.getName()).log(Level.SEVERE, null, ex);
+        }
+             if(rs1!=null)
+             {
+              while(rs1.next())
+            {
+             sale_amount=Float.parseFloat(rs1.getString(1));
+            }
+               
+        
+      }
+           }
+             if(pst1!=null)
+           {
+        
+         try {
+           
+             rs2 = pst1.executeQuery();
+             } catch (SQLException ex) {
+            Logger.getLogger(Main_page.class.getName()).log(Level.SEVERE, null, ex);
+        }
+             if(rs2!=null)
+      {
+              while(rs1.next())
+            {
+             cost_of_sale_amount=Float.parseFloat(rs1.getString(1));
+            }
+               
+        
+       float profit=sale_amount-cost_of_sale_amount;
+        jTextField3.setText(Float.toString(profit));
+        
+        float profit_percent=((profit/cost_of_sale_amount)*100);
+        jTextField4.setText(Float.toString(profit_percent));
+        }
+           }
+            
     }
      String getMonthForInt(int num) {
         String month = "wrong";
@@ -55,13 +140,13 @@ public class Main_page extends javax.swing.JFrame {
         
             if(filtered==1)
             {
-            pst = login.conn.prepareStatement("Select \"Select ID , Quantity ,Categroy, Amount from sales where Date=?");
+            pst = login.conn.prepareStatement("Select ID , Quantity ,Categroy, Amount from sales where Date=?");
              pst.setDate(1,  new java.sql.Date(jDateChooser1.getDate().getTime()));
               
             }
             else if(filtered==2)
             {
-                pst = login.conn.prepareStatement("Select \"Select ID , Quantity ,Categroy, Amount from sales where Month=?");
+                pst = login.conn.prepareStatement( "Select ID , Quantity ,Categroy, Amount from sales where Month=?");
              pst.setString(1,  getMonthForInt(jMonthChooser1.getMonth()));
              
             }
@@ -76,7 +161,7 @@ public class Main_page extends javax.swing.JFrame {
                 pst = login.conn.prepareStatement("Select ID , Quantity ,Categroy, Amount from sales  ");
             }
             
-       
+      
       
         try {
            
@@ -89,6 +174,8 @@ public class Main_page extends javax.swing.JFrame {
             ((DefaultTableModel) sales_table.getModel()).removeRow(0);
         }
        int columns=0;
+        if(rs1!=null)
+       {
         try {
             columns = rs1.getMetaData().getColumnCount();
         } catch (SQLException ex) {
@@ -114,7 +201,7 @@ public class Main_page extends javax.swing.JFrame {
             Logger.getLogger(Main_page.class.getName()).log(Level.SEVERE, null, ex);
         }
      
-         
+       }
     }
     
     public void populate_purchase() throws SQLException
@@ -147,8 +234,7 @@ public class Main_page extends javax.swing.JFrame {
                 
                  pst = login.conn.prepareStatement("Select ID ,Categroy, Quantity , Amount from purchases ");
             
-            
-       
+     
       
         try {
            
@@ -166,6 +252,9 @@ public class Main_page extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(Main_page.class.getName()).log(Level.SEVERE, null, ex);
         }
+               
+       if(rs1!=null)
+       {
         try {
             while(rs1.next())
             {
@@ -189,7 +278,7 @@ public class Main_page extends javax.swing.JFrame {
          
     }
     }
-    
+    }
     public void populate_inventory() throws SQLException
     {
         {
@@ -230,7 +319,7 @@ public class Main_page extends javax.swing.JFrame {
 "group by Item,Categroy ");
             
             
-       
+      
       
         try {
            
@@ -243,6 +332,8 @@ public class Main_page extends javax.swing.JFrame {
             ((DefaultTableModel) inventory_table.getModel()).removeRow(0);
         }
        int columns=0;
+        if(rs1!=null)
+       {
         try {
             columns = rs1.getMetaData().getColumnCount();
         } catch (SQLException ex) {
@@ -267,7 +358,7 @@ public class Main_page extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(Main_page.class.getName()).log(Level.SEVERE, null, ex);
         }
-     
+       }
          
     }
     }
@@ -305,6 +396,10 @@ public class Main_page extends javax.swing.JFrame {
         jMonthChooser1 = new com.toedter.calendar.JMonthChooser();
         jYearChooser1 = new com.toedter.calendar.JYearChooser();
         jButton1 = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
+        jTextField3 = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        jTextField4 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Fruit Managment System");
@@ -314,6 +409,8 @@ public class Main_page extends javax.swing.JFrame {
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setFont(new java.awt.Font("Baskerville Old Face", 1, 24)); // NOI18N
         setForeground(new java.awt.Color(255, 0, 153));
+        setMaximumSize(new java.awt.Dimension(21474, 21474));
+        setPreferredSize(new java.awt.Dimension(1000, 700));
 
         Sales_tab.setBackground(new java.awt.Color(0, 0, 0));
         Sales_tab.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -488,18 +585,22 @@ public class Main_page extends javax.swing.JFrame {
             }
         });
 
+        jLabel8.setText("Profit");
+
+        jLabel9.setText("Profit%");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(Sales_tab)
-                .addGap(117, 117, 117)
+                .addComponent(Sales_tab, javax.swing.GroupLayout.PREFERRED_SIZE, 786, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(129, 129, 129)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(70, 70, 70))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -512,57 +613,71 @@ public class Main_page extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(77, 77, 77)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel7)
                         .addGap(18, 18, 18)
                         .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(1014, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 385, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(filter, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
+                                .addGap(10, 10, 10)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
                                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jMonthChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jYearChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(10, 10, 10)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(787, 787, 787))))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jMonthChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jYearChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(44, 44, 44)
+                                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))))))
+                .addGap(645, 645, 645))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(filter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jMonthChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jYearChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel7)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8)
+                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9)
+                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(184, 184, 184)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(135, 135, 135)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(filter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(jMonthChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jYearChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel7)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(40, 40, 40)
-                        .addComponent(Sales_tab, javax.swing.GroupLayout.PREFERRED_SIZE, 865, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(54, Short.MAX_VALUE))
+                        .addComponent(Sales_tab, javax.swing.GroupLayout.PREFERRED_SIZE, 865, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(71, 71, 71)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(121, 121, 121)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
 
         pack();
@@ -736,6 +851,7 @@ public class Main_page extends javax.swing.JFrame {
             jMonthChooser1.setVisible(false);
              jDateChooser1.setVisible(false);
         }
+        
     }//GEN-LAST:event_filterActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -745,6 +861,14 @@ public class Main_page extends javax.swing.JFrame {
 
             fillsalecost(filtered);
             fillpurchasecost(filtered);
+        } catch (SQLException ex) {
+            Logger.getLogger(Main_page.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            populate_sales(); //Code to Populate Sales Tab
+            populate_purchase();//Code to Populate Purchase
+        populate_inventory();//Code to Populate Purchase
+        populate_profit();//Code to Populate Profit & profit_percent
         } catch (SQLException ex) {
             Logger.getLogger(Main_page.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -806,12 +930,16 @@ public class Main_page extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private com.toedter.calendar.JMonthChooser jMonthChooser1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField jTextField4;
     private com.toedter.calendar.JYearChooser jYearChooser1;
     private javax.swing.JTable purchase_table;
     private javax.swing.JScrollPane sales_tab;

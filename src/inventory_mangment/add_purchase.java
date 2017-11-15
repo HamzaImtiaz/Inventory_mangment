@@ -450,7 +450,9 @@ this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize()
          int updated_stock=quantity_int+remaining_stock;
          float updated_rate=0;
          if(latest_rate!=0)
-          updated_rate=(rate_float+latest_rate)/2;
+         //updated_rate=(rate_float+latest_rate)/2;
+         updated_rate=((remaining_stock*latest_rate)+amount_float)/(remaining_stock+quantity_int);
+         
          else
              updated_rate=rate_float;
          Date entry_date=date;

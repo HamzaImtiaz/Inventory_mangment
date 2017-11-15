@@ -509,7 +509,32 @@ this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize()
     
     
     }//GEN-LAST:event_quantityMouseClicked
+    public void insertValuesincost_of_sale(String selection, String item, int quantity_int,Date date,String month,String Year) throws SQLException, ClassNotFoundException
+    {
+        float latest_rate= new add_purchase().getlatestrate(selection,item);
+        
+       float value=latest_rate*quantity_int;
+       
+       PreparedStatement add_sales = null;
+        java.sql.Date sqlDate=null;
+        try {
+            add_sales = login.conn.prepareStatement("INSERT INTO  cost_of_sales(Quantity,rate,value,Date,Month,Year)\n"
+                    + "VALUES (?,?,?,?,?,?)");
+            add_sales.setInt(1,quantity_int);
+            add_sales.setFloat(2, latest_rate);
+            add_sales.setFloat(3, value);
+            add_sales.setDate(4,new java.sql.Date(date.getTime()));
+            add_sales.setString(5, month);
+            add_sales.setString(6, Year);
+           
+            
 
+            add_sales.execute();
+        } catch (SQLException ex) {
+            Logger.getLogger(add_sale.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
+    }
     private void save_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_save_buttonActionPerformed
         // TODO add your handling code here:
          String selection = gettreevalue(this.jTree1);
@@ -553,6 +578,7 @@ this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize()
              {
                   
                  try {
+                     insertValuesincost_of_sale(selection,item,quantity_int,date,entry_month,year);
                      insertValuesinsales(selection, quantity_int, amount_float, date, item,entry_month,year);
                  } catch (SQLException ex) {
                      Logger.getLogger(add_sale.class.getName()).log(Level.SEVERE, null, ex);
